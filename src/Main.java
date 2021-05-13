@@ -20,8 +20,8 @@ public class Main {
         stores.put(6668, new ArrayList<>());
         files.put("a", 0);
         files.put("b", 0);
-        System.out.println(files);
-        System.out.println("RESULT: " +c.generateBalancedConfig(stores, files, 2));
+        //System.out.println(files);
+        //System.out.println("RESULT: " +c.generateBalancedConfig(stores, files, 2));
 
         c.listen();
     }

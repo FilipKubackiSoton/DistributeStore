@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class Dstore extends ConcurrentTCPServer{
+public class Dstore extends ControllerThread {
     private int timeout;
 
     private final Socket serverSocket = new Socket();
@@ -19,7 +19,7 @@ public class Dstore extends ConcurrentTCPServer{
 
     public Dstore(int port, int cport, int timeout, File folder) throws IOException {
         super(port);
-        setCallbackSupplier(DstoreCallback::new);
+        setPositioningF(DstoreCallback::new);
         DstoreLogger.init(Logger.LoggingType.ON_FILE_AND_TERMINAL, port);
         this.timeout = timeout;
         this.folder = folder;

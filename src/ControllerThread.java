@@ -6,10 +6,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
-public class ConcurrentTCPServer {
-    private ExecutorService service;
+public class ControllerThread {
+
     private ServerSocket serverSocket;
-    private Function<Socket, ControllerInterface> callbackSupplier;
+    private Function<Socket, ControllerInterface> positioningF;
+    private ExecutorService executor;
 
     public interface ControllerInterface extends Runnable{
         void joinTokenHandler(JoinToken token, Socket socket, PrintWriter out);
@@ -23,28 +24,30 @@ public class ConcurrentTCPServer {
         void rebalanceCompleteTokenHandler(RebalanceCompleteToken token,Socket socket, PrintWriter out);
     }
 
-    public ConcurrentTCPServer(int port) throws IOException {
-        this(port, null);
-    }
-
-    public ConcurrentTCPServer(int port, Function<Socket, ControllerInterface> callbackSupplier) throws IOException{
-        this.service = Executors.newCachedThreadPool();
-        this.serverSocket = new ServerSocket(port);
-        this.callbackSupplier = callbackSupplier;
-
-    }
-
-    public void setCallbackSupplier(Function<Socket, ControllerInterface> callbackSupplier){
-        this.callbackSupplier = callbackSupplier;
-    }
-
     public void listen() throws IOException{
         for(;;){
             Socket socket = serverSocket.accept();
-            ControllerInterface callback = callbackSupplier.apply(socket);
-            service.submit(callback);
+            ControllerInterface callback = positioningF.apply(socket);
+            executor.submit(callback);
         }
     }
+
+    public ControllerThread(int port, Function<Socket, ControllerInterface> callbackSupplier) throws IOException{
+        this.executor = Executors.newCachedThreadPool();
+        this.serverSocket = new ServerSocket(port);
+        this.positioningF = callbackSupplier;
+
+    }
+
+    public void setPositioningF(Function<Socket, ControllerInterface> positioningF){
+        this.positioningF = positioningF;
+    }
+
+    public ControllerThread(int port) throws IOException {
+        this(port, null);
+    }
+
+
 
 
 }
